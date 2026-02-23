@@ -1,6 +1,8 @@
 from gui.main_window import MainWindow
+from utils.logger import setup_logger
 
 if __name__ == "__main__":
+    setup_logger()
     app = MainWindow()
     app.run()
 

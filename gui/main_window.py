@@ -3,6 +3,8 @@ from gui.input_frame import InputFrame
 from gui.import_frame import ImportFrame
 from logic.excel_editor import run_export
 from models.app_data import AppData
+from tkinter import messagebox
+import logging
 
 class MainWindow:
     def __init__(self):
@@ -42,7 +44,13 @@ class MainWindow:
         self.current_frame.pack(expand=True, fill="both")
 
     def export(self):
-        run_export(self.data)
+        try:
+            run_export(self.data)
+            messagebox.showinfo("完了", "出力が完了しました")
+            logging.info("出力成功")
+        except ValueError as e:
+            logging.exception("出力失敗")
+            messagebox.showerror("エラー", f"エラーが発生しました\n{e}")
 
     def run(self):
         self.root.mainloop()

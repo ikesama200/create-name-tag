@@ -1,9 +1,11 @@
 import shutil
+import os
 from openpyxl import load_workbook
 from datetime import datetime
-import os
+import logging
 
 def run_export(data):
+    logging.info("出力処理開始")
     if not data.template_path:
       raise ValueError("テンプレートが選択されていません")
 
@@ -22,3 +24,4 @@ def run_export(data):
     ws = wb.active
     ws["A1"] = value
     wb.save(out_file)
+    logging.info("出力処理終了")
