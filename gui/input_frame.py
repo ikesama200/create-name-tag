@@ -12,4 +12,4 @@ class InputFrame(tk.Frame):
         tk.Button(self, text="保存", command=self.save).pack()
 
     def save(self):
-        self.data["value"] = self.entry.get()
+        self.data.value = self.entry.get()

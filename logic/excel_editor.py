@@ -4,8 +4,11 @@ from datetime import datetime
 import os
 
 def run_export(data):
-    template = data.get("template")
-    value = data.get("value", "")
+    if not data.template_path:
+      raise ValueError("テンプレートが選択されていません")
+
+    template = data.template_path
+    value = data.value
 
     if not template:
         return

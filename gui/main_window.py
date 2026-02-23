@@ -2,6 +2,7 @@ import tkinter as tk
 from gui.input_frame import InputFrame
 from gui.import_frame import ImportFrame
 from logic.excel_editor import run_export
+from models.app_data import AppData
 
 class MainWindow:
     def __init__(self):
@@ -9,7 +10,8 @@ class MainWindow:
         self.root.title("Excel自動編集ツール")
         self.root.geometry("600x400")
 
-        self.data = {}  # 入力値保持用
+        # 入力値保持用
+        self.data = AppData()
 
         self.frame_area = tk.Frame(self.root)
         self.frame_area.pack(expand=True, fill="both")

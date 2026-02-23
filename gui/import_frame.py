@@ -12,5 +12,5 @@ class ImportFrame(tk.Frame):
 
     def select(self):
         path = filedialog.askopenfilename(filetypes=[("Excel", "*.xlsx")])
-        self.data["template"] = path
+        self.data.template_path = path
         self.label.config(text=path)
