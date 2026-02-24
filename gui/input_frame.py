@@ -11,6 +11,12 @@ class InputFrame(tk.Frame):
         # 仮名表示のチェックボックス
         self.kana_var = tk.BooleanVar()
         tk.Checkbutton(self, text="仮名表示", variable=self.kana_var).pack()
+        # ラベルを並べる
+        tk.Label(self, text="名前").pack(side="left", fill="x")
+        tk.Label(self, text="仮名名").pack(side="left", fill="x")
+        tk.Label(self, text="項目A").pack(side="left", fill="x")
+        tk.Label(self, text="項目B").pack(side="left", fill="x")
+
         # 名前項目
         tk.Label(self, text="名前").pack()
         self.name = tk.Entry(self)
