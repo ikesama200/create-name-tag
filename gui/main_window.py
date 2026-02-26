@@ -3,6 +3,7 @@ from gui.input_frame import InputFrame
 from gui.import_frame import ImportFrame
 from logic.excel_editor import run_export
 from models.app_data import AppData
+from models.name_tag import NameTag
 from tkinter import messagebox
 import logging
 
@@ -14,13 +15,22 @@ class MainWindow:
 
         # 入力値保持用
         self.data = AppData()
+        # 名札情報のセット
+        self.name_tag = {}
+        self.name_tag[0] = NameTag(
+            value="",
+            name="",
+            nameKana="",
+            itemA="",
+            itemB=""
+        )
 
         self.frame_area = tk.Frame(self.root)
         self.frame_area.pack(expand=True, fill="both")
 
         self.frames = {
-            "input": InputFrame(self.frame_area, self.data),
-            "import": ImportFrame(self.frame_area, self.data),
+            "input": InputFrame(self.frame_area, self.data, self.name_tag),
+            "import": ImportFrame(self.frame_area, self.data, self.name_tag),
         }
 
         self.current_frame = None
@@ -48,6 +58,8 @@ class MainWindow:
             run_export(self.data)
             messagebox.showinfo("完了", "出力が完了しました")
             logging.info("出力成功")
+            logging.info(f"入力値: {self.data.value}")
+            logging.info(f"名札情報: {self.name_tag[0]}")
         except ValueError as e:
             logging.exception("出力失敗")
             messagebox.showerror("エラー", f"エラーが発生しました\n{e}")

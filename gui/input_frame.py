@@ -1,9 +1,10 @@
 import tkinter as tk
 
 class InputFrame(tk.Frame):
-    def __init__(self, master, data):
+    def __init__(self, master, data, name_tag):
         super().__init__(master)
         self.data = data
+        self.name_tag = name_tag
 
         tk.Label(self, text="入力値").pack()
         self.entry = tk.Entry(self)
@@ -38,3 +39,7 @@ class InputFrame(tk.Frame):
 
     def save(self):
         self.data.value = self.entry.get()
+        self.name_tag[0].name = self.name.get()
+        self.name_tag[0].nameKana = self.nameKana.get()
+        self.name_tag[0].itemA = self.itemA.get()
+        self.name_tag[0].itemB = self.itemB.get()

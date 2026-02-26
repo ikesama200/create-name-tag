@@ -2,9 +2,10 @@ import tkinter as tk
 from tkinter import filedialog
 
 class ImportFrame(tk.Frame):
-    def __init__(self, master, data):
+    def __init__(self, master, data, name_tag):
         super().__init__(master)
         self.data = data
+        self.name_tag = name_tag
 
         tk.Button(self, text="テンプレ選択", command=self.select).pack()
         self.label = tk.Label(self, text="")
