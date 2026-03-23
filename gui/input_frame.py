@@ -8,6 +8,7 @@ class InputFrame(tk.Frame):
 
         self.labels = ["名前", "仮名名", "項目A", "項目B"]
         self.input_row_count = 5  # ← 行数
+        self.button_row = self.input_row_count + 2  # ← ボタン行数
         self.entries = []  # 2次元リスト
 
         self.create_input_table()
@@ -23,15 +24,15 @@ class InputFrame(tk.Frame):
         
         # ヘッダーのラベルを作成
         for col, name in enumerate(self.labels):
-            label = tk.Label(self, text=name, width=12, borderwidth=1, relief="solid")
+            label = tk.Label(self, text=name, borderwidth=1, relief="solid")
             label.grid(row=1, column=col, sticky="nsew")
 
         # 入力欄を作成
         for r in range(self.input_row_count):
             self.add_row()
 
-        tk.Button(self, text="行追加", command=self.add_row).grid(row=self.input_row_count+2, column=0, columnspan=len(self.labels), pady=10)
-        tk.Button(self, text="保存", command=self.save).grid(row=self.input_row_count+3, column=0, columnspan=len(self.labels), pady=10)
+        tk.Button(self, text="行追加", command=self.add_row).grid(row=self.button_row, column=0, columnspan=len(self.labels), pady=10)
+        tk.Button(self, text="保存", command=self.save).grid(row=self.button_row, column=1, columnspan=len(self.labels), pady=10)
 
         # カラムを伸ばす設定
         for col in range(len(self.labels)):
@@ -45,6 +46,7 @@ class InputFrame(tk.Frame):
             entry.grid(row=r, column=c, padx=2, pady=2, sticky="nsew")
             row_entries.append(entry)
         self.entries.append(row_entries)
+        self.button_row += 2
 
     def save(self):
         self.data.value = self.entry.get()
