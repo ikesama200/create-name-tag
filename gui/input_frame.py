@@ -1,4 +1,5 @@
 import tkinter as tk
+from models.name_tag import NameTag
 
 class InputFrame(tk.Frame):
     def __init__(self, master, data, name_tag):
@@ -63,9 +64,6 @@ class InputFrame(tk.Frame):
         # #self.entry = tk.Entry(self)
         # self.entry.pack()
 
-        # 仮名表示のチェックボックス
-        #self.kana_var = tk.BooleanVar()
-        #tk.Checkbutton(self, text="仮名表示", variable=self.kana_var).grid(row=0, column=0, columnspan=len(self.labels))
         # 入力項目のラベルを作成
         for col, name in enumerate(self.labels):
             label = tk.Label(self.scroll_frame, text=name, borderwidth=1, relief="solid")
@@ -74,9 +72,6 @@ class InputFrame(tk.Frame):
         # 入力欄を作成
         for r in range(self.input_row_count):
             self.add_row()
-
-        #tk.Button(self, text="行追加", command=self.add_row).grid(row=self.button_row, column=0, columnspan=len(self.labels), pady=10)
-        #tk.Button(self, text="保存", command=self.save).grid(row=self.button_row, column=1, columnspan=len(self.labels), pady=10)
 
         # カラムを伸ばす設定
         for col in range(len(self.labels)):
@@ -133,10 +128,18 @@ class InputFrame(tk.Frame):
 
             btn.configure(command=lambda row=r: self.delete_row(row))
             btn.grid(row=r, column=len(self.labels))
-
+    # -------------------------
+    # 入力データ保存
+    # -------------------------
     def save(self):
-        self.data.value = self.entry.get()
-        self.name_tag[0].name = self.name.get()
-        self.name_tag[0].nameKana = self.nameKana.get()
-        self.name_tag[0].itemA = self.itemA.get()
-        self.name_tag[0].itemB = self.itemB.get()
+        table_data = []
+        for r,(row_entries, btn) in enumerate(self.entries):
+            row_values = [cell.get() for cell in row_entries]
+            self.name_tag[r] = NameTag(
+                value=r,
+                name=row_values[0] if row_values else "",
+                nameKana=row_values[1] if row_values else "",
+                itemA=row_values[2] if row_values else "",
+                itemB=row_values[3] if row_values else ""
+            )
+            table_data.append(row_values)
