@@ -1,5 +1,6 @@
 import tkinter as tk
 from models.name_tag import NameTag
+from logic.import_csv import open_csv_mapping_dialog
 
 class InputFrame(tk.Frame):
     def __init__(self, master, data, name_tag):
@@ -27,7 +28,8 @@ class InputFrame(tk.Frame):
         # 仮名表示のチェックボックス
         self.kana_var = tk.BooleanVar()
         tk.Checkbutton(header, text="仮名表示", variable=self.kana_var).pack(side="left", padx=5)
-
+        # CSV取込ボタン
+        tk.Button(header, text="CSV取込", command=self.import_csv).pack(side="right", padx=5)
         # 行追加ボタン
         tk.Button(header, text="行追加", command=self.add_row).pack(side="right", padx=5)
         # 保存ボタン
@@ -37,18 +39,16 @@ class InputFrame(tk.Frame):
     # -------------------------
     def create_scroll_area(self):
         self.canvas = tk.Canvas(self)
-
+        self.scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
         self.scroll_frame = tk.Frame(self.canvas)
         self.scroll_frame.bind(
             "<Configure>",
-            lambda e: self.canvas.configure(
-                scrollregion=self.canvas.bbox("all")
-            )
+            lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all"))
         )
         self.canvas.create_window((0, 0), window=self.scroll_frame, anchor="nw")
-        scrollbar = tk.Scrollbar(self, orient="vertical", command=self.canvas.yview)
-        scrollbar.pack(side="right", fill="y")
+        self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.canvas.pack(side="left", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
         # マウスホイール対応
         self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 
@@ -98,6 +98,14 @@ class InputFrame(tk.Frame):
         self.entries.append((row_entries, btn))
         self.button_row += 2
     # -------------------------
+    # 行追加＋値セット
+    # -------------------------
+    def add_row_insert_values(self, values):
+        self.add_row()    
+        row_entries, btn = self.entries[-1]
+        for i, (entry, value) in enumerate(zip(row_entries, values)):
+            entry.insert(0, value)
+    # -------------------------
     # 行削除
     # -------------------------
     def delete_row(self, row_index):
@@ -143,3 +151,17 @@ class InputFrame(tk.Frame):
                 itemB=row_values[3] if row_values else ""
             )
             table_data.append(row_values)
+    # -------------------------
+    # CSV取込処理呼び出し
+    # -------------------------
+    def import_csv(self):
+        open_csv_mapping_dialog(self, self.data, self.labels, self)
+    # -------------------------
+    # 入力項目全削除
+    # -------------------------
+    def clear_all_rows(self):
+        for row_entries, btn in self.entries:
+            for e in row_entries:
+                e.destroy()
+            btn.destroy()
+        self.entries.clear()
