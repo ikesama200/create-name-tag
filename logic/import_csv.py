@@ -64,9 +64,6 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
 
         combo_vars.append(var)
         combos.append(combo)
-    
-    preview_frame = tk.Frame(dialog)
-    preview_frame.grid(row=3, column=0, columnspan=20, pady=10)
 
     # -------------------------
     # プレビュー処理
@@ -75,9 +72,10 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
         mapping = [var.get() for var in combo_vars]
         col_index_map = {name: i for i, name in enumerate(columns)}
 
+        start_index = 1 if skip_header_var.get() else 0
         preview_data = []
 
-        for row in rows[:3]:
+        for row in reader[start_index:start_index+3]:
             new_row = [""] * len(columns)
 
             for csv_col, target_name in enumerate(mapping):
@@ -99,7 +97,7 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
         def do_import():
             input_frame.clear_all_rows()
 
-            for row in rows:
+            for row in reader[start_index:]:
                 new_row = [""] * len(columns)
 
                 for csv_col, target_name in enumerate(mapping):
@@ -120,7 +118,7 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
             dialog.destroy()
 
         render_buttons(do_import)
-        #show_preview_dialog(preview_data, mapping, rows)
+        #show_preview_dialog(preview_data, mapping, reader)
 
     # -------------------------
     # プレビューの描画
@@ -229,3 +227,19 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
 
     tk.Button(btn_frame, text="取込", command=preview_import).pack(side="left", padx=10)
     tk.Button(btn_frame, text="閉じる", command=dialog.destroy).pack(side="left", padx=10)
+    
+    # -------------------------
+    # 先頭行スキップチェックボックス
+    # -------------------------
+    skip_header_var = tk.BooleanVar(value=True)
+    tk.Checkbutton(
+        dialog,
+        text="1行目は取り込まない",
+        variable=skip_header_var
+    ).grid(row=3, column=0, columnspan=20, pady=5)
+
+    # -------------------------
+    # プレビュー画面の領域宣言
+    # -------------------------
+    preview_frame = tk.Frame(dialog)
+    preview_frame.grid(row=4, column=0, columnspan=20, pady=10)
