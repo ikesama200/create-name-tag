@@ -25,7 +25,7 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
 
     dialog = tk.Toplevel(parent)
     dialog.title("CSV取込設定")
-    dialog.geometry("800x200")
+    dialog.geometry("800x350")
 
     combo_vars = []
     combos = []
@@ -64,6 +64,9 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
 
         combo_vars.append(var)
         combos.append(combo)
+    
+    preview_frame = tk.Frame(dialog)
+    preview_frame.grid(row=3, column=0, columnspan=20, pady=10)
 
     # -------------------------
     # プレビュー処理
@@ -89,7 +92,78 @@ def open_csv_mapping_dialog(parent, data, columns, input_frame):
 
             preview_data.append(new_row)
 
-        show_preview_dialog(preview_data, mapping, rows)
+        # プレビュー描画
+        render_preview(preview_data)
+
+        # OK時の処理定義
+        def do_import():
+            input_frame.clear_all_rows()
+
+            for row in rows:
+                new_row = [""] * len(columns)
+
+                for csv_col, target_name in enumerate(mapping):
+                    if not target_name:
+                        continue
+
+                    if csv_col >= len(row):
+                        continue
+
+                    target_idx = col_index_map[target_name]
+                    new_row[target_idx] = row[csv_col]
+
+                input_frame.add_row_insert_values(new_row)
+
+            input_frame.save()
+
+            clear_preview()
+            dialog.destroy()
+
+        render_buttons(do_import)
+        #show_preview_dialog(preview_data, mapping, rows)
+
+    # -------------------------
+    # プレビューの描画
+    # -------------------------
+    def render_preview(preview_data):
+        # 既存削除
+        clear_preview()
+
+        # タイトル
+        tk.Label(preview_frame, text="プレビュー").grid(
+            row=0, column=0, columnspan=len(columns)
+        )
+
+        # ヘッダー
+        for col, name in enumerate(columns):
+            tk.Label(
+                preview_frame,
+                text=name,
+                borderwidth=1,
+                relief="solid"
+            ).grid(row=1, column=col, sticky="nsew")
+
+        # データ（最大3行）
+        for r, row in enumerate(preview_data, start=2):
+            for c, val in enumerate(row):
+                tk.Label(preview_frame, text=val).grid(
+                    row=r, column=c, sticky="nsew"
+                )
+    # -------------------------
+    # プレビューのクリア
+    # -------------------------
+    def clear_preview():
+        for widget in preview_frame.winfo_children():
+            widget.destroy()
+    # -------------------------
+    # OK/キャンセルボタンの追加
+    # -------------------------
+    def render_buttons(do_import):
+        btn_frame = tk.Frame(preview_frame)
+        btn_frame.grid(row=10, column=0, columnspan=len(columns), pady=5)
+
+        tk.Button(btn_frame, text="OK", command=do_import).pack(side="left", padx=10)
+        tk.Button(btn_frame, text="キャンセル", command=lambda: clear_preview()).pack(side="left", padx=10)
 
     # -------------------------
     # プレビュー画面
