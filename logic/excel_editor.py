@@ -39,11 +39,12 @@ def resource_path(relative_path):
 # Excel書き込み処理の実行
 # -------------------------
 def load_excel_file(name_tag):
+  # Excelテンプレートのパスを取得
   template_path = resource_path("templates/template.xlsx")
-
+  # 出力先のパスを生成
   os.makedirs("output", exist_ok=True)
   output_path = f"output/result_{datetime.now():%Y%m%d_%H%M%S}.xlsx"
-
+  # Excelへの書き込み処理を実行
   write_to_excel(name_tag, template_path, output_path) 
 
 # -------------------------
@@ -52,30 +53,22 @@ def load_excel_file(name_tag):
 def write_to_excel(name_tag, template_path, output_path):
   # テンプレートを呼び出し
   wb = load_workbook(template_path)
-  # ワークシートを選択
-  ws = wb.active
+  # データ書き込み用のシートを選択
+  ws = wb["List"]
   # データ書き込み
   for i, row in name_tag.items():
-      # 配列の中身を展開して変数に格納
-      name = row.name
-      kana = row.nameKana
-      itemA = row.itemA
-      itemB = row.itemB
-      # 列オフセットと行ベースを計算
-      col_offset = (i % 2) * 2
-      # 
-      row_base = (i // 2) * 2
-
-      base_row = 2 + row_base
-      base_col = 1 + col_offset  # A=1
-
-      # 上段左
-      ws.cell(row=base_row, column=base_col).value = itemA
-      # 上段右
-      ws.cell(row=base_row + 1, column=base_col).value = itemB
-      # 中段
-      ws.cell(row=base_row, column=base_col + 1).value = kana
-      # 最下段
-      ws.cell(row=base_row, column=base_col + 2).value = name
+    # 書き込み行をセット(2行目からスタート)
+    execl_row = i + 2
+    # A列 空行
+    # B列 行番号
+    ws.cell(row=execl_row, column=2).value = row.value + 1
+    # C列 名前
+    ws.cell(row=execl_row, column=3).value = row.name
+    # D列 仮名
+    ws.cell(row=execl_row, column=4).value = row.nameKana
+    # E列 項目A
+    ws.cell(row=execl_row, column=5).value = row.itemA
+    # F列 項目B
+    ws.cell(row=execl_row, column=6).value = row.itemB
 
   wb.save(output_path)
