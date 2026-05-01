@@ -5,6 +5,8 @@ import re
 from openpyxl import load_workbook
 from openpyxl.utils import range_boundaries
 from openpyxl.cell.cell import MergedCell
+from openpyxl.worksheet.pagebreak import Break
+from openpyxl.worksheet.pagebreak import RowBreak
 from datetime import datetime
 from copy import copy
 import logging
@@ -76,7 +78,7 @@ def write_to_excel(name_tag, template_path, output_path):
     ws.cell(row=execl_row, column=5).value = row.itemA
     # F列 項目B
     ws.cell(row=execl_row, column=6).value = row.itemB
-
+  # 書き込んだExcelを出力先のファイル名で保存
   wb.save(output_path)
 
 # -------------------------
@@ -92,6 +94,9 @@ def write_to_nametag_sheet(name_tag, output_path):
     # 現在のデータが2番目以降の場合はセルの書式をコピーする
     if i >= 2:
         copy_output_block(ws, 2, row_base)
+  # 名札シートに改ページ設定を追加
+  set_page_break(ws, 15)
+  # 書き込んだExcelを出力先のファイル名で保存
   wb.save(output_path)
 
 # -------------------------
@@ -121,10 +126,16 @@ def copy_output_block(ws, src_row, dest_row):
           dest_cell.fill = copy(src_cell.fill)
           dest_cell.number_format = src_cell.number_format
           dest_cell.alignment = copy(src_cell.alignment)
+    # 行の高さを取得
+    src_dim = ws.row_dimensions[src_row + r]
+    dest_dim = ws.row_dimensions[dest_row + r]
+    # コピー元のセルの高さを確認(デフォルトがNone)
+    if src_dim.height is not None:
+        # コピー先のセルに行の高さをコピーする
+        dest_dim.height = src_dim.height
 
   for merged in list(ws.merged_cells.ranges):
     min_col, min_row, max_col, max_row = range_boundaries(str(merged))
-
     # コピー元ブロック内だけ対象
     if src_row <= min_row <= src_row + 2:
       new_min_row = min_row + row_offset
@@ -144,3 +155,17 @@ def shift_formula(formula, row_offset):
     return f"{col}{row + ((row_offset // 3) * 2)}"
 
   return re.sub(r'([A-Z]+)(\d+)', repl, formula)
+# -------------------------
+# シートへの改ページ設定の追加
+# -------------------------
+def set_page_break(ws,break_row):
+  # 既存クリア
+  ws.row_breaks = RowBreak()
+  # 改ページ開始行を計算
+  start_break_row = 1 + break_row
+  # 改ページ追加
+  for i in range(start_break_row, ws.max_row, break_row):
+      ws.row_breaks.append(Break(id=i))
+  # 印刷設定
+  ws.page_setup.fitToHeight = False
+  ws.page_setup.fitToWidth = False
