@@ -11,6 +11,8 @@ from datetime import datetime
 from copy import copy
 import logging
 
+from models.name_tag import NameTag
+
 def run_export(data):
   logging.info("出力処理開始")
   if not data.template_path:
@@ -42,6 +44,29 @@ def resource_path(relative_path):
   return os.path.join(os.path.abspath("."), relative_path)
 
 # -------------------------
+# 名札情報から空のデータを削除して再作成する処理
+# -------------------------
+def recreate_name_tag(name_tag):
+  # 再作成する名札データを作成
+  new_name_tag = {}
+  idx = 0
+  for i, row in name_tag.items():
+    # 行番号または行番号以外が空の場合はスキップする
+    if (row.value == "") or (row.name == "" and row.nameKana == "" and row.itemA == "" and row.itemB == ""):
+      continue
+    # 再作成用の名札データに追加する(行番号は新しく採番)
+    new_name_tag[idx] = NameTag(
+        value=idx,
+        name=row.name,
+        nameKana=row.nameKana,
+        itemA=row.itemA,
+        itemB=row.itemB
+    )
+    # インデックスを進める
+    idx += 1
+  return new_name_tag
+
+# -------------------------
 # Excel書き込み処理の実行
 # -------------------------
 def load_excel_file(name_tag):
@@ -50,10 +75,12 @@ def load_excel_file(name_tag):
   # 出力先のパスを生成
   os.makedirs("output", exist_ok=True)
   output_path = f"output/result_{datetime.now():%Y%m%d_%H%M%S}.xlsx"
+  # 名札情報から空のデータを削除
+  new_name_tag = recreate_name_tag(name_tag)
   # Excelへの書き込み処理を実行
-  write_to_excel(name_tag, template_path, output_path)
+  write_to_excel(new_name_tag, template_path, output_path)
   # 名札表示用のシートの調整処理を実行
-  write_to_nametag_sheet(name_tag, output_path)
+  write_to_nametag_sheet(new_name_tag, output_path)
 
 # -------------------------
 # Excelへの書き込み処理

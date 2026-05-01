@@ -32,8 +32,8 @@ class InputFrame(tk.Frame):
         tk.Button(header, text="CSV取込", command=self.import_csv).pack(side="right", padx=5)
         # 行追加ボタン
         tk.Button(header, text="行追加", command=self.add_row).pack(side="right", padx=5)
-        # 保存ボタン
-        tk.Button(header, text="保存", command=self.save).pack(side="right", padx=5)
+        # 保存ボタン(オミット)
+        # tk.Button(header, text="保存", command=self.save).pack(side="right", padx=5)
     # -------------------------
     # スクロールエリア作成
     # -------------------------
@@ -84,6 +84,7 @@ class InputFrame(tk.Frame):
         row_entries = []
         for c in range(len(self.labels)):
             entry = tk.Entry(self.scroll_frame)
+            entry.bind("<FocusOut>", lambda e: self.save())
             entry.grid(row=r, column=c, padx=2, pady=2, sticky="nsew")
             row_entries.append(entry)
         # 削除ボタンの追加
@@ -97,6 +98,9 @@ class InputFrame(tk.Frame):
         # 入力欄とボタンを配置
         self.entries.append((row_entries, btn))
         self.button_row += 2
+        # 行追加のたびに入力情報を保存
+        self.save()
+
     # -------------------------
     # 行追加＋値セット
     # -------------------------
@@ -105,6 +109,7 @@ class InputFrame(tk.Frame):
         row_entries, btn = self.entries[-1]
         for i, (entry, value) in enumerate(zip(row_entries, values)):
             entry.insert(0, value)
+
     # -------------------------
     # 行削除
     # -------------------------
@@ -136,6 +141,8 @@ class InputFrame(tk.Frame):
 
             btn.configure(command=lambda row=r: self.delete_row(row))
             btn.grid(row=r, column=len(self.labels))
+        # 再配置後に入力情報を保存
+        self.save()
     # -------------------------
     # 入力データ保存
     # -------------------------

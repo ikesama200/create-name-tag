@@ -57,6 +57,7 @@ class MainWindow:
     def export(self):
         try:
             #run_export(self.data)
+            InputFrame.save(self.frames["input"])
             load_excel_file(self.name_tag)
             messagebox.showinfo("完了", "出力が完了しました")
             logging.info("出力成功")
