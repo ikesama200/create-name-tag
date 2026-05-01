@@ -7,6 +7,7 @@ from openpyxl.utils import range_boundaries
 from openpyxl.cell.cell import MergedCell
 from openpyxl.worksheet.pagebreak import Break
 from openpyxl.worksheet.pagebreak import RowBreak
+from tkinter import filedialog, messagebox
 from datetime import datetime
 from copy import copy
 import logging
@@ -44,6 +45,18 @@ def resource_path(relative_path):
   return os.path.join(os.path.abspath("."), relative_path)
 
 # -------------------------
+# Excelの出力先を選択するダイアログの表示
+# -------------------------
+def select_save_path():
+    file_path = filedialog.asksaveasfilename(
+        title="保存先を選択",
+        defaultextension=".xlsx",
+        filetypes=[("Excelファイル", "*.xlsx")],
+        initialfile=f"名札{datetime.now():%Y%m%d}.xlsx"
+    )
+    return file_path
+
+# -------------------------
 # 名札情報から空のデータを削除して再作成する処理
 # -------------------------
 def recreate_name_tag(name_tag):
@@ -70,17 +83,30 @@ def recreate_name_tag(name_tag):
 # Excel書き込み処理の実行
 # -------------------------
 def load_excel_file(name_tag):
-  # Excelテンプレートのパスを取得
-  template_path = resource_path("templates/template.xlsx")
-  # 出力先のパスを生成
-  os.makedirs("output", exist_ok=True)
-  output_path = f"output/result_{datetime.now():%Y%m%d_%H%M%S}.xlsx"
   # 名札情報から空のデータを削除
   new_name_tag = recreate_name_tag(name_tag)
+  # 空データ削除後の名札情報が空なら終了
+  if  not new_name_tag:
+    messagebox.showerror("エラー", "出力するデータがありません")
+    return False
+  # Excelテンプレートのパスを取得
+  template_path = resource_path("templates/template.xlsx")
+  # 出力先のパスを取得
+  output_path = select_save_path()
+  # 出力先パスが空の場合(キャンセルされた場合)は処理を中断
+  if not output_path:
+      return False
+
+  # 出力先のファイル名が.xlsxで終わっていない場合は.xlsxを付与する
+  if not output_path.endswith(".xlsx"):
+    output_path += ".xlsx"
   # Excelへの書き込み処理を実行
-  write_to_excel(new_name_tag, template_path, output_path)
+  if not write_to_excel(new_name_tag, template_path, output_path):
+      return False
   # 名札表示用のシートの調整処理を実行
-  write_to_nametag_sheet(new_name_tag, output_path)
+  if not write_to_nametag_sheet(new_name_tag, output_path):
+      return False
+  return True
 
 # -------------------------
 # Excelへの書き込み処理
@@ -106,7 +132,12 @@ def write_to_excel(name_tag, template_path, output_path):
     # F列 項目B
     ws.cell(row=execl_row, column=6).value = row.itemB
   # 書き込んだExcelを出力先のファイル名で保存
-  wb.save(output_path)
+  try:
+    wb.save(output_path)
+  except PermissionError:
+    messagebox.showerror("エラー", "ファイルが開かれています")
+    return False
+  return True
 
 # -------------------------
 # 表示用シートへの書き込み処理
@@ -124,7 +155,12 @@ def write_to_nametag_sheet(name_tag, output_path):
   # 名札シートに改ページ設定を追加
   set_page_break(ws, 15)
   # 書き込んだExcelを出力先のファイル名で保存
-  wb.save(output_path)
+  try:
+    wb.save(output_path)
+  except PermissionError:
+    messagebox.showerror("エラー", "ファイルが開かれています")
+    return False
+  return True
 
 # -------------------------
 # 出力用のセルを書式ごとコピー

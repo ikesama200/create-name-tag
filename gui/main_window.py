@@ -42,9 +42,10 @@ class MainWindow:
     def create_buttons(self):
         bar = tk.Frame(self.root)
         bar.pack(fill="x")
-
-        tk.Button(bar, text="入力画面", command=lambda: self.show_frame("input")).pack(side="left")
-        tk.Button(bar, text="取込画面", command=lambda: self.show_frame("import")).pack(side="left")
+        # 入力画面への遷移ボタン(デフォルトが入力画面のためオミット)
+        # tk.Button(bar, text="入力画面", command=lambda: self.show_frame("input")).pack(side="left")
+        # 取り込み画面への遷移ボタン(オミット)
+        # tk.Button(bar, text="取込画面", command=lambda: self.show_frame("import")).pack(side="left")
         tk.Button(bar, text="出力実行", command=self.export).pack(side="left")
         tk.Button(bar, text="終了", command=self.root.quit).pack(side="right")
 
@@ -58,10 +59,10 @@ class MainWindow:
         try:
             #run_export(self.data)
             InputFrame.save(self.frames["input"])
-            load_excel_file(self.name_tag)
+            if not load_excel_file(self.name_tag):
+                return
             messagebox.showinfo("完了", "出力が完了しました")
             logging.info("出力成功")
-            logging.info(f"入力値: {self.data.value}")
             for r in range(len(self.name_tag)):
                 logging.info(f"名札情報: {self.name_tag[r]}")
         except ValueError as e:
