@@ -49,7 +49,8 @@ def load_excel_file(name_tag):
   os.makedirs("output", exist_ok=True)
   output_path = f"output/result_{datetime.now():%Y%m%d_%H%M%S}.xlsx"
   # Excelへの書き込み処理を実行
-  write_to_excel(name_tag, template_path, output_path) 
+  write_to_excel(name_tag, template_path, output_path)
+  # 名札表示用のシートの調整処理を実行
   write_to_nametag_sheet(name_tag, output_path)
 
 # -------------------------
@@ -88,10 +89,8 @@ def write_to_nametag_sheet(name_tag, output_path):
   ws = wb["NameTag"]
   for i, row in name_tag.items():
     row_base = 2 + (i // 2) * 3
-    print(f"i={i}, row_base={row_base}")
-    # 
+    # 現在のデータが2番目以降の場合はセルの書式をコピーする
     if i >= 2:
-        print("copy!", row_base)
         copy_output_block(ws, 2, row_base)
   wb.save(output_path)
 
@@ -108,7 +107,6 @@ def copy_output_block(ws, src_row, dest_row):
         # ★ 追加：MergedCellはスキップ
         if isinstance(src_cell, MergedCell) or isinstance(dest_cell, MergedCell):
             continue
-        print(f"src_row={src_row} dest_row={dest_row} r={r} c={c}")
 
         # セルの値をコピー
         if isinstance(src_cell.value, str) and src_cell.value.startswith("="):
@@ -116,7 +114,6 @@ def copy_output_block(ws, src_row, dest_row):
         else:
           dest_cell.value = src_cell.value
         
-        print(dest_cell.value)
         # セルの書式をコピー
         if src_cell.has_style:
           dest_cell.font = copy(src_cell.font)
@@ -144,6 +141,6 @@ def shift_formula(formula, row_offset):
   def repl(match):
     col = match.group(1)
     row = int(match.group(2))
-    return f"{col}{row + row_offset - 1}"
+    return f"{col}{row + ((row_offset // 3) * 2)}"
 
   return re.sub(r'([A-Z]+)(\d+)', repl, formula)
