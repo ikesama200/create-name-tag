@@ -10,15 +10,16 @@
 - Python 3.10 以上をインストールしてください
 - リポジトリをダウンロード直後は以下を実行してください
 ### windowsの場合
-    `python -m venv venv`  
-    `venv\Scripts\activate`  
-    `pip install -r requirements.txt`  
+    python -m venv venv  
+    venv\Scripts\activate  
+    pip install -r requirements.txt  
 
 ### macOS / Linux
-    `python -m venv venv`  
-    `source venv/bin/activate`  
-    `pip install -r requirements.txt`  
+    python -m venv venv  
+    source venv/bin/activate  
+    pip install -r requirements.txt  
 ---
 ## 起動
 - venvを起動状態で以下のコマンドを実行してください  
-    `python .\main.py`
+
+    python .\main.py
