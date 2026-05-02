@@ -52,7 +52,7 @@ def select_save_path():
         title="保存先を選択",
         defaultextension=".xlsx",
         filetypes=[("Excelファイル", "*.xlsx")],
-        initialfile=f"名札{datetime.now():%Y%m%d}.xlsx"
+        initialfile=f"名札_{datetime.now():%Y%m%d}.xlsx"
     )
     return file_path
 
