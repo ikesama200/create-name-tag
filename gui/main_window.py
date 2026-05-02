@@ -62,11 +62,11 @@ class MainWindow:
             if not load_excel_file(self.name_tag):
                 return
             messagebox.showinfo("完了", "出力が完了しました")
-            # logging.info("出力成功")
-            # for r in range(len(self.name_tag)):
-            #     logging.info(f"名札情報: {self.name_tag[r]}")
+            logging.info("出力成功")
+            for r in range(len(self.name_tag)):
+                logging.info(f"名札情報: {self.name_tag[r]}")
         except ValueError as e:
-            # logging.exception("出力失敗")
+            logging.exception("出力失敗")
             messagebox.showerror("エラー", f"エラーが発生しました\n{e}")
 
     def run(self):
