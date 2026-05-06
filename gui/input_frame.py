@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from models.name_tag import NameTag
 from logic.import_csv import open_csv_mapping_dialog
 
@@ -114,10 +115,16 @@ class InputFrame(tk.Frame):
     # 行削除
     # -------------------------
     def delete_row(self, row_index):
+        # 削除確認ダイアログを表示
+        result = messagebox.askyesno("行削除", f"{row_index}行目の入力項目を削除しますか？")
+        # いいえを選択した場合は処理を終了する
+        if not result:
+            return 
         # インデックス補正(行の番号とリストのインデックスは1ずれているため)
         idx = row_index - 1
         # インデックスが範囲外の場合は何もしない
         if idx >= len(self.entries):
+            messagebox.showerror("エラー", "削除対象の行が存在しません")
             return
         # 削除対象の行から入力欄とボタンを分割して取得
         row_entries, btn = self.entries[idx]
