@@ -114,21 +114,27 @@ class InputFrame(tk.Frame):
     # 行削除
     # -------------------------
     def delete_row(self, row_index):
-        # インデックス補正（ヘッダー分）
-        idx = row_index + 1
+        # インデックス補正(行の番号とリストのインデックスは1ずれているため)
+        idx = row_index - 1
+        # インデックスが範囲外の場合は何もしない
         if idx >= len(self.entries):
             return
+        # 削除対象の行から入力欄とボタンを分割して取得
         row_entries, btn = self.entries[idx]
-        # 行項目削除
+        # 削除対象の行項目削除
         for e in row_entries:
             e.destroy()
+        
+        # 削除対象の行の削除ボタン削除
         btn.destroy()
-
         # リストから削除
         self.entries.pop(idx)
-
-        # 再配置（これ重要）
+        # 再配置の処理を実行
         self.refresh_rows()
+        # 行削除後に件数が0件以下になった場合は、行を1行追加しておく
+        if len(self.entries) <= 0:
+            self.add_row()
+
     # -------------------------
     # 行再配置
     # -------------------------
